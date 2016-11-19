@@ -59,14 +59,14 @@ class _Bo:
     def _do_request(self, url, timeout=None, params=None):
         proxies = self.get_proxies()
 
-        try:
-            r = requests.get(url, params=params, headers=toutv.config.HEADERS,
-                             proxies=proxies, timeout=timeout)
-            if r.status_code != 200:
-                raise toutv.exceptions.UnexpectedHttpStatusCodeError(url,
-                                                                     r.status_code)
-        except requests.exceptions.Timeout:
-            raise toutv.exceptions.RequestTimeoutError(url, timeout)
+        not_completed = True
+        while not_completed:
+            try:
+                r = requests.get(url, params=params, headers=toutv.config.HEADERS,
+                                 proxies=proxies, timeout=timeout)
+                not_completed = r.status_code != 200
+            except requests.exceptions.Timeout:
+                pass
 
         return r
 

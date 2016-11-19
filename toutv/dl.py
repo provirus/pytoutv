@@ -90,18 +90,18 @@ class Downloader:
     def _do_request(self, url, params=None, stream=False):
         self._logger.debug('HTTP GET request @ {}'.format(url))
 
-        try:
-            r = requests.get(url, params=params, headers=toutv.config.HEADERS,
-                             proxies=self._proxies, cookies=self._cookies,
-                             timeout=self._timeout, stream=stream)
+        not_completed = True
+        while not_completed:
+            try:
+                r = requests.get(url, params=params, headers=toutv.config.HEADERS,
+                                 proxies=self._proxies, cookies=self._cookies,
+                                 timeout=self._timeout, stream=stream)
 
-            if r.status_code != 200:
-                raise toutv.exceptions.UnexpectedHttpStatusCodeError(url,
-                                                                     r.status_code)
-        except requests.exceptions.Timeout:
-            raise toutv.exceptions.RequestTimeoutError(url, timeout)
-        except requests.exceptions.ConnectionError as e:
-            raise toutv.exceptions.NetworkError() from e
+                not_completed = r.status_code != 200
+            except requests.exceptions.Timeout:
+                pass
+            except requests.exceptions.ConnectionError as e:
+                pass
 
         return r
 
